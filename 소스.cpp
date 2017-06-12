@@ -131,7 +131,7 @@ void insert_node(ROOT *r, int key)
 
 void insert_fixup(ROOT *r, NODE *x)
 {
-	NODE *u = NULL;;
+	NODE *u = NULL;
 
 	while ((x->p)->clr == RED)
 	{
@@ -214,6 +214,8 @@ void tree_transplant(ROOT *r, NODE *t, NODE *c)
 	c->p = t->p;
 }
 
+int del, miss;
+
 void delete_fixup(ROOT *r, NODE *x);
 void delete_node(ROOT *r, int key)
 {
@@ -222,16 +224,26 @@ void delete_node(ROOT *r, int key)
 	NODE *x = NULL; // temp's original position
 	char t_clr;
 
-	while (key != target->key)
+	while (target != r->nil)
 	{
 		if (target->key > key)
 		{
 			target = target->left;
 		}
+		else if (target->key == key) {
+			break;
+		}
 		else
 		{
 			target = target->right;
 		}
+	}
+	if (target == r->nil) {
+		miss++;
+		return;
+	}
+	else {
+		del++;
 	}
 	t_clr = target->clr;
 
@@ -270,6 +282,9 @@ void delete_node(ROOT *r, int key)
 	if (t_clr == BLACK)
 	{
 		delete_fixup(r, x);
+	}
+	if (target == r->r) {
+		r->r = r->nil;
 	}
 
 	free(target);
@@ -365,25 +380,29 @@ void inorder(ROOT* rbt, NODE *n, int p)
 	if (n == rbt->nil) return;
 	inorder(rbt, n->left, p);
 	total++;
-	if (n->left != rbt->nil || n->right != rbt->nil) {
+	if (n->clr == BLACK && (n->left != rbt->nil || n->right != rbt->nil)) {
 		nb++;
 	}
 	if (p == 1) {
-		printf("%d\n", n->key);
+		printf("%d %c\n", n->key, n->clr==BLACK?'B':'R');
 	}
 	inorder(rbt, n->right, p);
 }
 
 int main()
 {
-	FILE *in = fopen("input.txt", "r");
-	int num;
+	char fn[100];
+	printf("filename = ");
+	scanf("%s", fn);
+	FILE *in = fopen(fn, "r");
+	int num, insert = 0;
 	ROOT *rbt = (ROOT*)malloc(sizeof(ROOT));
 	create_nilnode(rbt);
 	while (!feof(in)) {
 		fscanf(in, "%d", &num);
 		if (num == 0) break;
 		if (num > 0) {
+			insert++;
 			insert_node(rbt, num);
 		}
 		else {
@@ -393,17 +412,19 @@ int main()
 	fclose(in);
 	
 	inorder(rbt, rbt->r, 0);
+	printf("filename=%s\n", fn);
 	printf("total = %d\n", total);
+	printf("insert = %d\n", insert);
+	printf("deleted = %d\n", del);
+	printf("miss = %d\n", miss);
 	printf("nb = %d\n", nb);
 	int bh = 0;
 	NODE* n = rbt->r;
-	while (n->left != rbt->nil) {
-		n = n->left;
-	} while (n != rbt->nil) {
-		n = n->p;
+	while (n != rbt->nil) {
 		if (n->clr == BLACK) {
 			bh++;
 		}
+		n = n->right;
 	}
 	printf("bh = %d\n", bh);
 	inorder(rbt, rbt->r, 1);
