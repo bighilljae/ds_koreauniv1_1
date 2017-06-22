@@ -391,10 +391,9 @@ void inorder(ROOT* rbt, NODE *n, int p)
 
 int main()
 {
+    NODE *ver;
 	char fn[100];
-	printf("filename = ");
-	scanf("%s", fn);
-	FILE *in = fopen(fn, "r");
+	FILE *in = fopen("input.txt", "r");
 	int num, insert = 0;
 	ROOT *rbt = (ROOT*)malloc(sizeof(ROOT));
 	create_nilnode(rbt);
@@ -410,7 +409,8 @@ int main()
 		}
 	}
 	fclose(in);
-	
+
+  /*
 	inorder(rbt, rbt->r, 0);
 	printf("filename=%s\n", fn);
 	printf("total = %d\n", total);
@@ -428,5 +428,17 @@ int main()
 	}
 	printf("bh = %d\n", bh);
 	inorder(rbt, rbt->r, 1);
+  */
+
+  in = fopen("search.txt","r");
+  while( !feof(in)){
+    fscanf(in, "%d", &num);
+    if( num == 0 ) break;
+    // search
+    ver = rbt->r;
+    while( ver->)
+    
+  }
+  fclose(in);
 	return 0;
 }
